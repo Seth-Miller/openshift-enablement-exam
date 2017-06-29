@@ -14,13 +14,15 @@ If you created your cluster with an ansible file you can do the following (this 
 
 ```
 ansible nodes -b -i hosts -m shell -a "systemctl stop atomic-openshift-node.service"
+ansible nodes -b -i hosts -m shell -a "systemctl stop origin-node.service"  # Only run if using Origin
 ansible nodes -b -i hosts -m shell -a 'docker stop `docker ps -q` && docker rm `docker ps -a -q` && docker rmi -f `docker images -q`'
 ansible nodes -b -i hosts -m shell -a "systemctl stop docker"
 ansible -vv nodes -b -i hosts -m replace -a "dest=/etc/sysconfig/docker regexp=\"OPTIONS='\" replace=\"OPTIONS=' --storage-opt dm.basesize=20G \" backup=yes"
 ansible nodes -b -i hosts -m shell -a "rm -rf /var/lib/docker"
-ansible nodes:!masters -b -i hosts -m shell -a "lvremove -f docker-vg/docker-pool && vgremove -f docker-vg"
+ansible nodes:\!masters -b -i hosts -m shell -a "lvremove -f docker-vg/docker-pool && vgremove -f docker-vg"
 ansible nodes -b -i hosts -m shell -a "systemctl start docker"
 ansible nodes -b -i hosts -m shell -a "systemctl start atomic-openshift-node.service"
+ansible nodes -b -i hosts -m shell -a "systemctl start origin-node.service" # Only run if using Origin
 ```
 
 If you have the luxury of creating an OpenShift cluster from scratch you can simple add `--storage-opt dm.basesize=20G` to the docker options in your ansible file.
