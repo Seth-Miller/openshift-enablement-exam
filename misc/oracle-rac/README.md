@@ -18,6 +18,8 @@ ansible nodes -b -i hosts -m shell -a "systemctl stop origin-node.service"  # On
 ansible nodes -b -i hosts -m shell -a 'docker stop `docker ps -q` && docker rm `docker ps -a -q` && docker rmi -f `docker images -q`'
 ansible nodes -b -i hosts -m shell -a "systemctl stop docker"
 ansible -vv nodes -b -i hosts -m replace -a "dest=/etc/sysconfig/docker regexp=\"OPTIONS='\" replace=\"OPTIONS=' --storage-opt dm.basesize=20G \" backup=yes"
+ansible nodes -b -i hosts -m replace -a "dest=/usr/lib/docker-storage-setup/docker-storage-setup regexp='^WIPE_SIGNATURES=.*' replace='WIPE_SIGNATURES=true' backup=yes"
+ansible nodes -b -i hosts -m shell -a "rm /etc/sysconfig/docker-storage"
 ansible nodes -b -i hosts -m shell -a "rm -rf /var/lib/docker"
 ansible nodes:\!masters -b -i hosts -m shell -a "lvremove -f docker-vg/docker-pool && vgremove -f docker-vg"
 ansible nodes -b -i hosts -m shell -a "systemctl start docker"
